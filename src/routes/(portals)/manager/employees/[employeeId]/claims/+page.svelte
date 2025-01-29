@@ -1,3 +1,4 @@
+<!-- src/routes/(portals)/manager/employees/[employeeId]/claims/+page.svelte -->
 <!-- Return employee with :employeeId's claims. Implement fetching logic in /api/claims  -->
 
 <script lang="ts">

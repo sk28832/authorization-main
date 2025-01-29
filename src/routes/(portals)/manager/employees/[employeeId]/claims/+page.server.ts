@@ -1,3 +1,4 @@
+// src/routes/(portals)/manager/employees/[employeeId]/claims/+page.server.ts -->
 import type { Claim } from '@prisma/client';
 
 export const load = async ({ fetch }) => {

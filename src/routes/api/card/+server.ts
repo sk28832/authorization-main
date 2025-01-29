@@ -1,3 +1,4 @@
+// src/routes/api/card/+server.ts
 // Accessible by both the specific employee or a manager of the employee's company
 
 import type { RequestHandler } from './$types';
