@@ -17,6 +17,8 @@ export const GET: RequestHandler = async ({ cookies }) => {
   const authId = cookies.get('authId');
   if (!authId) throw error(401);
 
+  const currentRoleId = cookies.get('currentRoleId') as string;
+
   const auth = await prisma.auth.findUnique({
     where: { id: authId },
     include: {
@@ -28,7 +30,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
   if (!auth) throw error(401);
 
   // Employee - get their claims
-  if (auth.employee) {
+  if (currentRoleId === 'employee' && auth.employee) {
     const claims = await prisma.claim.findMany({
       where: { employeeId: auth.employee.id },
       orderBy: { date: 'desc' }
@@ -37,7 +39,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
   }
 
   // Manager - get company claims
-  if (auth.permissions.some(p => p.role === 'manager')) {
+  if (currentRoleId === 'manager' && auth.permissions.some(p => p.role === 'manager')) {
     const companyId = auth.permissions.find(p => p.role === 'manager')?.companyId;
     const claims = await prisma.claim.findMany({
       where: {
