@@ -1,9 +1,18 @@
-// Display a table of the employee's claims. Implement fetching logic in /api/claims
+// routes/(portals)/employee/claims/+page.server.ts
+import { redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
+import { prisma } from '$lib/server';
 
-import type { Claim } from '@prisma/client';
+export const load: PageServerLoad = async ({ cookies }) => {
+  const authId = cookies.get('authId');
+  if (!authId) throw redirect(303, '/signin');
 
-export const load = async ({ fetch }) => {
-	const res = await fetch(`/api/claims`);
-	const data = (await res.json()) as { claims: Claim[] };
-	return data;
+  const employee = await prisma.employee.findUnique({
+    where: { authId },
+    include: { claims: true }
+  });
+
+  if (!employee) throw redirect(303, '/signin');
+
+  return { claims: employee.claims };
 };

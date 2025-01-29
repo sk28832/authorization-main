@@ -8,11 +8,48 @@ Just make sure the data returned is for the right role.
 
 */
 
+// routes/api/claims/+server.ts
 import type { RequestHandler } from './$types';
 import { prisma } from '$lib/server';
-import { json } from '@sveltejs/kit';
+import { json, error } from '@sveltejs/kit';
 
-export const GET: RequestHandler = async () => {
-	const claims = await prisma.claim.findMany();
-	return json({ claims });
+export const GET: RequestHandler = async ({ cookies }) => {
+  const authId = cookies.get('authId');
+  if (!authId) throw error(401);
+
+  const auth = await prisma.auth.findUnique({
+    where: { id: authId },
+    include: {
+      employee: true,
+      permissions: true
+    }
+  });
+
+  if (!auth) throw error(401);
+
+  // Employee - get their claims
+  if (auth.employee) {
+    const claims = await prisma.claim.findMany({
+      where: { employeeId: auth.employee.id },
+      orderBy: { date: 'desc' }
+    });
+    return json({ claims });
+  }
+
+  // Manager - get company claims
+  if (auth.permissions.some(p => p.role === 'manager')) {
+    const companyId = auth.permissions.find(p => p.role === 'manager')?.companyId;
+    const claims = await prisma.claim.findMany({
+      where: {
+        employee: { companyId }
+      },
+      include: {
+        employee: { select: { name: true } }
+      },
+      orderBy: { date: 'desc' }
+    });
+    return json({ claims });
+  }
+
+  throw error(403);
 };
