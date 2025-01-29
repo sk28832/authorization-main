@@ -2,17 +2,32 @@
 <!-- Return employee with :employeeId's claims. Implement fetching logic in /api/claims  -->
 
 <script lang="ts">
-	export let data;
+  import type { Claim } from '@prisma/client';
+
+  export let data: { claims: Claim[] };
 </script>
 
-Claims
+<h1>Employee Claims</h1>
 
 <table>
-	{#each data.claims as claim}
-		<tr>
-			<td>{claim.provider}</td>
-			<td>{claim.amountCents} cents</td>
-			<td>{claim.date}</td>
-		</tr>
-	{/each}
+  <thead>
+    <tr>
+      <th>Provider</th>
+      <th>Amount</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {#each data.claims as claim}
+      <tr>
+        <td>{claim.provider}</td>
+        <td>${claim.amountCents / 100}</td>
+        <td>{new Date(claim.date).toLocaleDateString()}</td>
+      </tr>
+    {/each}
+  </tbody>
 </table>
+
+{#if data.claims.length === 0}
+  <p>No claims found.</p>
+{/if}

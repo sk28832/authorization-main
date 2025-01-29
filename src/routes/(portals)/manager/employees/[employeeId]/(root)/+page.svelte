@@ -1,16 +1,16 @@
 <!-- src/routes/(portals)/manager/employees/[employeeId]/(root)/+page.svelte -->
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import { page } from '$app/stores';
 
-	let svg = '';
+  let svg = '';
 
-	onMount(async () => {
-		const res = await fetch(`/api/card?employeeId=${$page.params.employeeId}`);
-		svg = await res.text();
-	});
+  onMount(async () => {
+    const res = await fetch(`/api/card?employeeId=${$page.params.employeeId}`);
+    svg = await res.text();
+  });
 </script>
 
 <div>
-	{@html svg}
+  {@html svg}
 </div>

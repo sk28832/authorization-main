@@ -1,4 +1,4 @@
-// routes/(portals)/manager/employees/[employeeId]/claims/+page.server.ts
+// routes/(portals)/manager/employees/[employeeId]/(root)/+page.server.ts
 import { redirect, error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { prisma } from '$lib/server';
@@ -17,8 +17,7 @@ export const load: PageServerLoad = async ({ cookies, params }) => {
   }
 
   const employee = await prisma.employee.findUnique({
-    where: { id: params.employeeId },
-    include: { claims: true }
+    where: { id: params.employeeId }
   });
 
   if (!employee) throw error(404, 'Employee not found');
@@ -29,5 +28,5 @@ export const load: PageServerLoad = async ({ cookies, params }) => {
 
   if (!hasAccess) throw redirect(303, '/');
 
-  return { claims: employee.claims };
+  return { employee };
 };
